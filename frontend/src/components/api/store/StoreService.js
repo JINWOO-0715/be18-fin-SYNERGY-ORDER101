@@ -9,7 +9,7 @@ export async function getFranchiseOrderList(page, pageSize, searchParams) {
     // 검색 조건
     fromDate: searchParams.fromDate || null,
     toDate: searchParams.toDate || null,
-    storeId: searchParams.storeId || null, // 가맹점 ID
+    vendorId: searchParams.storeId || null, // 가맹점 ID
     statuses: searchParams.statuses || null,
     searchText: searchParams.searchText || null,
 
@@ -32,6 +32,7 @@ export async function getFranchiseOrderList(page, pageSize, searchParams) {
     throw new Error('가맹점 API 서버와의 통신에 실패했습니다.')
   }
 }
+
 
 /**
  * [가맹점 목록 조회]

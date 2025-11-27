@@ -29,16 +29,16 @@ const totalCount = ref(0)
 
 // 타입 옵션 - currentType에 따라 동적으로 결정
 const typeOptions = computed(() => {
-  if (props.currentType === 'ALL') {
-    return [
-      { label: '가맹점', value: 'FRANCHISE' },
-      { label: '공급업체', value: 'SUPPLIER' },
-    ]
-  } else if (props.currentType === 'FRANCHISE') {
-    return [{ label: '가맹점', value: 'FRANCHISE' }]
-  } else {
-    return [{ label: '공급업체', value: 'SUPPLIER' }]
-  }
+    if (props.currentType === 'ALL') {
+        return [
+            { label: '가맹점', value: 'FRANCHISE' },
+            { label: '공급업체', value: 'SUPPLIER' }
+        ]
+    } else if (props.currentType === 'FRANCHISE') {
+        return [{ label: '가맹점', value: 'FRANCHISE' }]
+    } else {
+        return [{ label: '공급업체', value: 'SUPPLIER' }]
+    }
 })
 
 // 탭 표시 여부

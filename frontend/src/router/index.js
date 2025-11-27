@@ -36,6 +36,9 @@ const ProductDetailView = () => import('../views/hq/store/ProductDetailView.vue'
 const SmartOrderListViewView = () => import('../views/hq/orders/SmartOrderListView.vue')
 const SmartOrderDetailView = () => import('../views/hq/orders/SmartOrderDetailView.vue')
 const DemandForecastView = () => import('../views/hq/dashboard/DemandForecastView.vue')
+const StoreOrderCreateView = () => import('../views/store/purchase/StoreOrderCreateView.vue')
+const StoreOrderDashboardView = () => import('../views/hq/dashboard/StoreOrderDashboardView.vue')
+
 const hqRoutes = [
   {
     path: '/hq/dashboard',
@@ -216,7 +219,13 @@ const hqRoutes = [
     path: '/hq/dashboard/forecast',
     name: 'hq-forecast',
     component: DemandForecastView,
-    meta: { title: '수요 예측' },
+    meta: { title: '수요 예측' }
+  },
+  {
+    path: '/hq/dashboard/order',
+    name: 'hq-dashboard-order',
+    component: StoreOrderDashboardView,
+    meta: { title: '주문 대시보드' },
   },
 ]
 
@@ -230,7 +239,7 @@ const storeRoutes = [
   {
     path: '/store/purchase/create',
     name: 'store-purchase-create',
-    component: PagePlaceholder,
+    component: StoreOrderCreateView,
     meta: { title: '발주 생성' },
   },
   {
