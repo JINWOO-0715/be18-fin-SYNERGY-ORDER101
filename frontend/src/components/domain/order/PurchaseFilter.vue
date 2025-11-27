@@ -1,15 +1,15 @@
 <template>
-    <div class="settlement-filter-container">
+    <div class="purchase-filter-container">
         <div class="filter-row">
-            <FilterDropdown label="범위" :options="scopeOptions" v-model="filters.scope" />
+            <FilterDropdown label="상태" :options="statusOptions" v-model="filters.status" />
 
-            <FilterDropdown label="가맹점/공급업체" :options="vendorOptions" v-model="filters.vendorId" :searchMode="true"
+            <FilterDropdown label="공급업체" :options="vendorOptions" v-model="filters.vendorId" :searchMode="true"
                 placeholder="전체" @triggerSearchModal="openVendorSearchModal" />
 
             <FilterDateRange label="날짜 범위" v-model:startDate="filters.startDate" v-model:endDate="filters.endDate" />
 
             <div class="search-group">
-                <FilterSearchInput label="검색" placeholder="검색어 입력..." v-model="filters.keyword" />
+                <FilterSearchInput label="검색" placeholder="PO 번호, 요청자 검색..." v-model="filters.keyword" />
                 <div class="button-actions">
                     <button class="btn-search" @click="applyFilters">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -29,24 +29,23 @@
             </div>
         </div>
 
-        <!-- scope prop 제거 -->
-        <VendorSearchModal v-if="isVendorModalOpen" :currentValue="filters.vendorId" :currentType="filters.vendorType"
+        <VendorSearchModal v-if="isVendorModalOpen" :currentValue="filters.vendorId" currentType="SUPPLIER"
             @close="isVendorModalOpen = false" @select="handleVendorSelect" />
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import FilterDropdown from '../../../base/FilterDropdown.vue';
-import FilterDateRange from '../../../base/FilterDateRange.vue';
-import FilterSearchInput from '../../../base/FilterSearchInput.vue';
+import { ref, computed } from 'vue';
+import FilterDropdown from '../../base/FilterDropdown.vue';
+import FilterDateRange from '../../base/FilterDateRange.vue';
+import FilterSearchInput from '../../base/FilterSearchInput.vue';
 import { getPastDateString } from '@/components/global/Date';
 import VendorSearchModal from '@/components/modal/VenderSearchModal.vue';
+import { purchaseStatusOptions } from '@/components/api/purchase/purchaseService';
 
 const initialFilters = {
-    scope: 'ALL',
+    status: 'ALL',
     vendorId: 'ALL',
-    vendorType: 'ALL', // 'ALL' | 'FRANCHISE' | 'SUPPLIER'
     vendorName: '전체',
     startDate: getPastDateString(30),
     endDate: new Date().toISOString().slice(0, 10),
@@ -56,11 +55,8 @@ const initialFilters = {
 const filters = ref({ ...initialFilters });
 const isVendorModalOpen = ref(false);
 
-const scopeOptions = [
-    { text: '전체', value: 'ALL' },
-    { text: '미수금(AR)', value: 'AR' },
-    { text: '미지급금(AP)', value: 'AP' },
-];
+// 상태 옵션
+const statusOptions = purchaseStatusOptions();
 
 const vendorOptions = ref([
     { text: '전체', value: 'ALL' },
@@ -69,87 +65,45 @@ const vendorOptions = ref([
 const emit = defineEmits(['search']);
 
 function openVendorSearchModal() {
-    console.log('📋 모달 열기');
     isVendorModalOpen.value = true;
 }
 
 /**
- * 모달에서 선택한 가맹점/공급사 처리
- * @param {Object} vendor - { type: 'FRANCHISE' | 'SUPPLIER', id: string, name: string, code: string }
+ * 모달에서 선택한 공급업체 처리
  */
 function handleVendorSelect(vendor) {
-    console.log('✅ 선택된 업체:', vendor);
+    const { id, name } = vendor;
 
-    const { type, id, name, code } = vendor;
-
-    // 필터 값 업데이트
-    filters.value.scope = 'ALL'; // 선택 시 전체로 변경
     filters.value.vendorId = id;
     filters.value.vendorName = name;
 
     // vendorOptions에 동적으로 추가 (중복 방지)
     const exists = vendorOptions.value.find(opt => opt.value === id);
     if (!exists && id !== 'ALL') {
-        const typeLabel = type === 'FRANCHISE' ? '[가맹점]' : '[공급사]';
         vendorOptions.value.push({
-            text: `${typeLabel} ${name}`,
+            text: `[공급업체] ${name}`,
             value: id
         });
-    }
-
-    // scope 자동 조정 (선택사항)
-    if (type === 'FRANCHISE') {
-        filters.value.scope = 'AR'; // 가맹점 → 미수금
-    } else if (type === 'SUPPLIER') {
-        filters.value.scope = 'AP'; // 공급사 → 미지급금
     }
 
     isVendorModalOpen.value = false;
 }
 
 function applyFilters() {
-    console.log('🔍 필터 적용:', {
-        scope: filters.value.scope,
-        vendorType: filters.value.vendorType,
-        vendorId: filters.value.vendorId,
-        vendorName: filters.value.vendorName,
-        startDate: filters.value.startDate,
-        endDate: filters.value.endDate,
-        keyword: filters.value.keyword
-    });
-
+    console.log('🔍 발주 필터 적용:', filters.value);
     emit('search', filters.value);
 }
 
 function resetFilters() {
-    console.log('🔄 필터 초기화');
+    console.log('🔄 발주 필터 초기화');
     filters.value = { ...initialFilters };
     vendorOptions.value = [{ text: '전체', value: 'ALL' }];
     applyFilters();
 }
-
-// scope 변경 시 vendorId 초기화 (선택사항)
-watch(() => filters.value.scope, (newScope) => {
-    console.log('📊 범위 변경:', newScope);
-    // scope 변경 시 업체 선택 초기화 (선택사항)
-    if (newScope === 'ALL') {
-        // 전체 선택 시 업체도 전체로 초기화
-        filters.value.vendorId = 'ALL';
-        filters.value.vendorName = '전체';
-        vendorOptions.value = [{ text: '전체', value: 'ALL' }];
-    } else if (newScope === 'AR') {
-        // AR 선택 시 가맹점만 표시되도록 vendorType 고정
-        filters.value.vendorType = 'FRANCHISE';
-    } else if (newScope === 'AP') {
-        // AP 선택 시 공급사만 표시되도록 vendorType 고정
-        filters.value.vendorType = 'SUPPLIER';
-    }
-});
 </script>
 
 <style scoped>
-/* 기존 스타일 유지 */
-.settlement-filter-container {
+.purchase-filter-container {
     padding: 15px;
 }
 
