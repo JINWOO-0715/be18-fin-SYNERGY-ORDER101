@@ -125,9 +125,19 @@ const isAuthRoute = computed(() => {
   return route.name === 'login' || route.path === '/login'
 })
 
-const sidebarSections = computed(() =>
-  currentRole.value === 'STORE_ADMIN' ? storeSidebar : filteredAdminSidebar.value,
-)
+const isHQ = computed(() => currentRole.value === 'HQ')
+
+const sidebarSections = computed(() => {
+  if (currentRole.value === 'STORE_ADMIN') {
+    return storeSidebar
+  }
+
+  if (isHQ.value) {
+    return adminSidebar.filter((section) => section.id !== 'users')
+  }
+
+  return adminSidebar
+})
 
 const isStoreRole = computed(() => currentRole.value === 'STORE_ADMIN')
 const isHqAdmin = computed(() => currentRole.value === 'HQ_ADMIN')
