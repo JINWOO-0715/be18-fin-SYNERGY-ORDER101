@@ -1,48 +1,58 @@
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:order101}
+    name: order101
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: ${DB_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATABASE_PASSWORD}
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     open-in-view: false
     show-sql: true
     properties:
       hibernate.format_sql: true
+  cache:
+    type: redis
   data:
     redis:
       host: ${REDIS_HOST}
-      port: ${REDIS_PORT:6379}
-      password: ${SPRING_DATA_REDIS_PASSWORD}
+      port: ${REDIS_PORT}
+      username: default
+      password: ${REDIS_PASSWORD}
+
 server:
   port: 8080
+
 jwt:
   secret: ${JWT_SECRET}
 
+ai:
+  python:
+    base-url: http://${AI_HOST}:${AI_PORT}/
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: order101
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
 logging:
   level:
+    root: INFO
+    com.synerge: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web.reactive.function.client: DEBUG
+    org.hibernate.resource.transaction: DEBUG
     org.springframework.jdbc: DEBUG
     org.hibernate: DEBUG
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-    org.springframework.security: DEBUG
-
-    # kakao:
-    #   client-id: ${KAKAO_CLIENT_ID}
-    #   redirect-uri: ${KAKAO_REDIRECT_URI}
-
-    # mail:
-  #   host: smtp.gmail.com
-  #   port: 587
-  #   username:
-  #   password:
-  #   properties:
-  #     mail:
-  #       smtp:
-  #         auth: true
-  #         starttls:
-  #           enable: true
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.orm.query: DEBUG

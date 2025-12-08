@@ -1,7 +1,39 @@
+.idea/
 **/application-dev.yml
-
+application.yml
 # Compiled class file
 *.class
+
+
+# === data & artifacts ===
+
+*.zip
+*.json
+*.pkl
+*.xlsx
+*.parquet
+
+# allow only small samples in data_pipeline
+!python-server/app/data_pipeline/sample_*.csv
+
+# notebooks cache
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# env / secrets
+.kaggle/
+.env
+.env.*
+secrets/*.json
+
+# models & outputs
+python-server/app/models/
+python-server/app/outputs/
+
+
+
+
 
 # Log file
 *.log
