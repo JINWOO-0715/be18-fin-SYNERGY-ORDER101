@@ -39,11 +39,11 @@
     <section class="summary-row">
       <div class="summary-card">
         <p class="summary-label">AI 추천 총 발주량</p>
-        <p class="summary-value">{{ totalRecommendedQty.toLocaleString() }} 건</p>
+        <p class="summary-value">{{ totalRecommendedQty.toLocaleString() }} </p>
       </div>
       <div class="summary-card">
         <p class="summary-label">예측 총 발주량</p>
-        <p class="summary-value">{{ totalForecastQty.toLocaleString() }} 건</p>
+        <p class="summary-value">{{ totalForecastQty.toLocaleString() }} </p>
       </div>
       <div class="summary-card">
         <p class="summary-label">초안</p>
@@ -72,7 +72,7 @@
               <th class="numeric">총 추천 발주량</th>
               <th class="numeric">총 발주 금액</th>
               <th class="center">상태</th>
-              <th class="center">주차</th>
+              <th class="center">생성일</th>
             </tr>
           </thead>
           <tbody>
