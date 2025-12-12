@@ -221,10 +221,11 @@ function statusClass(s) {
 }
 
 function typeClass(type) {
-  if (!type) return ''
-  if (type === '스마트') return 'type-smart'
-  if (type === '자동') return 'type-auto'
-  return 'type-manual'
+  if (!type) return 't-manual'
+  const upperType = type.toUpperCase()
+  if (upperType === 'AUTO' || upperType === '자동') return 't-auto'
+  if (upperType === 'SMART' || upperType === '스마트') return 't-smart'
+  return 't-manual'
 }
 </script>
 
@@ -233,51 +234,55 @@ function typeClass(type) {
   background: #16a34a;
 }
 
-.s-waiting {
+
+/* 타입 배지 스타일 */
 .type-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
   display: inline-block;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.type-smart {
-  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-  color: white;
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
-  animation: pulse-smart 2s ease-in-out infinite;
-}
-
-.type-auto {
-  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  color: white;
-  box-shadow: 0 2px 4px rgba(6, 182, 212, 0.3);
+.t-auto {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   animation: pulse-auto 2s ease-in-out infinite;
 }
 
-.type-manual {
-  background: #e2e8f0;
-  color: #475569;
+.t-smart {
+  background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+  animation: pulse-smart 2s ease-in-out infinite;
 }
 
-@keyframes pulse-smart {
-  0%, 100% {
-    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.6);
-  }
+.t-manual {
+  background: #64748b;
+  color: white;
 }
 
 @keyframes pulse-auto {
   0%, 100% {
-    box-shadow: 0 2px 4px rgba(6, 182, 212, 0.3);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   }
   50% {
-    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.6);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.5);
   }
 }
+
+@keyframes pulse-smart {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.5);
+  }
+}
+
+.s-waiting {
   background: #d97706;
 }
 
