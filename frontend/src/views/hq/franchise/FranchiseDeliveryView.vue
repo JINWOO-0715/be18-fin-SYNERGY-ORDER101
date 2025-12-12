@@ -223,7 +223,9 @@ function goNext() {
   if (page.value + 1 < totalPages.value) changePage(page.value + 2)
 }
 
-
+/* ===============================
+ * 필터
+ * =============================== */
 function applyFilter() {
   page.value = 0
   fetchDeliveryList()
@@ -269,8 +271,12 @@ function formatDateTime(dt) {
   return dt ? dt.replace('T', ' ').slice(0, 19) : '-'
 }
 
+/* ===============================
+ * 초기 로드
+ * =============================== */
 onMounted(fetchDeliveryList)
 </script>
+
 
 
 
