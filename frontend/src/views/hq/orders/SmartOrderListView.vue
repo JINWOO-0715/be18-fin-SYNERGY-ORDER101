@@ -228,6 +228,8 @@ function groupBySupplierAndWeek() {
       g.status = 'SUBMITTED'
     } else if (status === 'CONFIRMED' && g.status !== 'SUBMITTED') {
       g.status = 'CONFIRMED'
+    } else if (status === 'SUBMITTED' && !['REJECTED', 'CONFIRMED'].includes(g.status)) {
+      g.status = 'SUBMITTED'
     }
   }
 
@@ -248,6 +250,7 @@ function statusLabel(s) {
   if (s === 'CONFIRMED') return '승인'
   if (s === 'SUBMITTED') return '제출'
   if (s === 'DRAFT_AUTO') return '초안'
+  if (s === 'REJECTED') return '반려'
   return s || '-'
 }
 
@@ -255,6 +258,7 @@ function statusClass(s) {
   if (s === 'CONFIRMED') return 's-confirmed'
   if (s === 'SUBMITTED') return 's-submitted'
   if (s === 'DRAFT_AUTO') return 's-draft'
+  if (s === 'REJECTED') return 's-rejected'
   return 's-unknown'
 }
 </script>
@@ -299,6 +303,10 @@ function statusClass(s) {
   padding: 8px 14px;
   cursor: pointer;
 }
+.s-rejected {
+  background: #ef4444;
+}
+
 
 .summary-row {
   display: flex;
