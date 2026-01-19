@@ -39,17 +39,6 @@ ai:
   python:
     base-url: http://${AI_HOST}:${AI_PORT}/
 
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    s3:
-      bucket: order101
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
 
 logging:
   level:

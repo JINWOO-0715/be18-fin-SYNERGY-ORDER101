@@ -1,9 +1,6 @@
 package com.synerge.order101.product.model.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+
 import com.synerge.order101.common.dto.ItemsResponseDto;
 import com.synerge.order101.common.exception.CustomException;
 import com.synerge.order101.inbound.model.repository.InboundDetailRepository;
@@ -71,10 +68,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductSupplierRepository productSupplierRepository;
     private final InventoryServiceImpl inventoryService;
 
-    private final AmazonS3 amazonS3;
+    // private final AmazonS3 amazonS3; // AWS S3 제거
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    // @Value("${cloud.aws.s3.bucket}")
+    // private String bucket;
+
 
     private static final String UPLOAD_ROOT = "uploads";
 
@@ -351,25 +349,19 @@ public class ProductServiceImpl implements ProductService {
             String ext = StringUtils.getFilenameExtension(originalName);
             String fileName = "product-" + UUID.randomUUID() + (ext != null ? "." + ext : "");
 
-            String key = "product-images/" + fileName;
-
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(imageFile.getSize());
-            metadata.setContentType(imageFile.getContentType());
-
-            try (InputStream inputStream = imageFile.getInputStream()) {
-                PutObjectRequest putObjectRequest = new PutObjectRequest(
-                        bucket,
-                        key,
-                        inputStream,
-                        metadata
-                );
-
-                amazonS3.putObject(putObjectRequest);
+            // 로컬 저장 경로 설정 (C:/project/uploads/product-images)
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), UPLOAD_ROOT, "product-images");
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
             }
 
-            return amazonS3.getUrl(bucket, key).toString();
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(imageFile.getInputStream(), filePath);
+
+            // 클라이언트에서 접근 가능한 경로 반환 (Nginx proxy 등을 통해 접근)
+            return "/uploads/product-images/" + fileName;
         } catch (IOException e) {
+            log.error("Local image upload failed", e);
             throw new CustomException(ProductErrorCode.IMAGE_UPLOAD_FAIL);
         }
     }
@@ -380,28 +372,13 @@ public class ProductServiceImpl implements ProductService {
         }
 
         try {
-
-            if(imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-                if(!imageUrl.contains(bucket)) {
-                    return;
-                }
-
-                URI uri = URI.create(imageUrl);
-                String path = uri.getPath();
-                if(path == null || path.isBlank()) {
-                    return;
-                }
-
-                String key = path.startsWith("/") ? path.substring(1) : path;
-
-                if(key.startsWith(bucket + "/")) {
-                    key = key.substring(bucket.length() + 1);
-                }
-
-                amazonS3.deleteObject(bucket, key);
-                return;
+            String fileName;
+            if (imageUrl.startsWith("/")) {
+                fileName = Paths.get(imageUrl).getFileName().toString();
+            } else {
+                return; // 외부 URL인 경우 무시
             }
-            String fileName = Paths.get(imageUrl).getFileName().toString();
+
             Path filePath = Paths.get(System.getProperty("user.dir"),
                     UPLOAD_ROOT,
                     "product-images",
@@ -411,9 +388,7 @@ public class ProductServiceImpl implements ProductService {
                 Files.delete(filePath);
             }
         } catch (IOException | java.nio.file.InvalidPathException e) {
-            throw new CustomException(ProductErrorCode.IMAGE_UPLOAD_FAIL);
-        } catch (com.amazonaws.services.s3.model.AmazonS3Exception e) {
-            // S3에 없으면(404) 그냥 넘어가도 되고, 지금은 일단 예외로 올려도 됨
+            log.error("Local image delete failed", e);
             throw new CustomException(ProductErrorCode.IMAGE_UPLOAD_FAIL);
         }
     }

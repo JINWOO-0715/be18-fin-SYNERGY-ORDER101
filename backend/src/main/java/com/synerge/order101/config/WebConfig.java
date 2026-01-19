@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
                 uploadRoot,
                 "product-images").toUri().toString();
 
-        registry.addResourceHandler("/product-images/**")
+        registry.addResourceHandler("/uploads/product-images/**")
                 .addResourceLocations(uploadPath); // file:///....../uploads/product-images/
     }
 }
