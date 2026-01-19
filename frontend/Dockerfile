@@ -1,12 +1,10 @@
-# 1단계: 빌드 환경 (Node)
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --frozen-lockfile || npm install
 COPY . .
+ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN npm run build 
-
-# 2단계: 실행 환경 (Nginx)
 FROM nginx:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
